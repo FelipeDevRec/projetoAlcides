@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="slides-format" content="viewport" />
+  <title>Argumentação e Inferência — José Luiz Fiorin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #fdf8ef;
+      --color-bg-deep: #f7efe2;
+      --color-surface: #fffaf2;
+      --color-text: #1e293b;
+      --color-text-secondary: #475569;
+      --color-text-muted: #64748b;
+      --color-accent-1: #c2410c;
+      --color-accent-2: #b8860b;
+      --color-accent-3: #65713a;
+      --color-glass-bg: rgba(255,255,255,0.82);
+      --color-glass-border: rgba(0,0,0,0.08);
+      --color-vignette: rgba(0,0,0,0.05);
+      --font-display: 'DM Serif Display', serif;
+      --font-body: 'Source Sans 3', sans-serif;
+    }
+  </style>
+  <style>
+    :root { --color-bg: #fdf8ef; --color-text: #1e293b; --glow-color-rgb: 194,65,12; }
+    * { box-sizing: border-box; }
+    html, body { margin:0; background: var(--color-bg); }
+    body { font-family: var(--font-body); color: var(--color-text); overflow: hidden; width:100vw; height:100vh; }
+    .deck { width:100vw; height:100vh; position:relative; }
+    .slide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transform:scale(.97); transition:opacity .7s ease, transform .7s ease; pointer-events:none; overflow:hidden; background:var(--color-bg); }
+    .slide.active { opacity:1; transform:scale(1); pointer-events:all; }
+    .slide > .content { position:relative; z-index:2; width:100%; max-width:1180px; padding:clamp(1.5rem,3vw,3rem); }
+    .nav-controls { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:100; display:flex; gap:14px; align-items:center; background:rgba(255,255,255,.78); backdrop-filter:blur(8px); border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:10px 18px; }
+    .nav-btn { width:38px; height:38px; border:none; border-radius:50%; background:#fff; cursor:pointer; color:#c2410c; font-size:20px; }
+    .slide-dots { display:flex; gap:8px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:#d6d3d1; cursor:pointer; }
+    .dot.active { background:#c2410c; transform:scale(1.2); }
+    .slide-counter { color:#64748b; font-size:.8rem; min-width:42px; text-align:center; }
+    .reveal { opacity:0; transform:translateY(16px); }
+    .gradient-mesh { position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+    .blob { position:absolute; border-radius:50%; filter:blur(80px); animation:float 14s ease-in-out infinite; }
+    .blob:nth-child(2){ animation-duration:18s; }
+    .blob:nth-child(3){ animation-duration:22s; }
+    @keyframes float { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(30px,-20px) scale(1.08);} }
+    .slide::before { content:''; position:absolute; inset:0; z-index:1; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); opacity:.03; }
+    .slide::after { content:''; position:absolute; inset:0; z-index:1; background:radial-gradient(ellipse at center, transparent 55%, var(--color-vignette) 100%); }
+    .hero-emoji { font-size:110px; animation:bob 3s ease-in-out infinite; }
+    @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .card { background:var(--color-glass-bg); border:1px solid var(--color-glass-border); border-radius:22px; box-shadow:0 10px 30px rgba(0,0,0,.06); }
+    .timeline-line { position:absolute; left:18px; top:10px; bottom:10px; width:3px; background:linear-gradient(to bottom, #c2410c, #b8860b); border-radius:99px; }
+    .timeline-dot { width:16px; height:16px; border-radius:50%; background:#c2410c; box-shadow:0 0 0 6px rgba(194,65,12,.12); }
+    .mini-bar { height:12px; border-radius:999px; background:linear-gradient(90deg,#c2410c,#b8860b); }
+    .quote { border-left:5px solid #c2410c; padding-left:18px; }
+    .smallcaps { letter-spacing:.18em; text-transform:uppercase; font-size:.8rem; color:#64748b; }
+    .slide-1 h1 { line-height:.95; }
+  </style>
+</head>
+<body>
+<div class="deck">
+  <section class="slide slide-1 active" data-slide="1">
+    <div class="gradient-mesh">
+      <div class="blob" style="width:320px;height:320px;top:-60px;right:-50px;background:#c2410c;opacity:.14"></div>
+      <div class="blob" style="width:260px;height:260px;bottom:-50px;left:-40px;background:#b8860b;opacity:.12"></div>
+      <div class="blob" style="width:220px;height:220px;top:42%;left:14%;background:#65713a;opacity:.1"></div>
+    </div>
+    <div class="content text-center">
+      <div class="hero-emoji reveal">📚</div>
+      <p class="smallcaps reveal mb-4">Linguística • Argumentação • Leitura</p>
+      <h1 class="font-display text-[clamp(2.8rem,6vw,5.4rem)] tracking-tight text-accent-1 reveal">Argumentação e Inferência</h1>
+      <p class="text-[clamp(1rem,2vw,1.45rem)] text-text-secondary mt-4 reveal">Apresentação do capítulo de José Luiz Fiorin</p>
+      <p class="mt-8 text-text-muted reveal">Grupo 2</p>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="gradient-mesh">
+      <div class="blob" style="width:280px;height:280px;top:-70px;right:-60px;background:#c2410c;opacity:.08"></div>
+      <div class="blob" style="width:220px;height:220px;bottom:-50px;left:-40px;background:#b8860b;opacity:.07"></div>
+    </div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Roteiro</p>
+      <h2 class="font-display text-5xl reveal mb-8">Caminho da apresentação</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="card p-6 reveal"><strong>1.</strong> Autor e contexto histórico</div>
+        <div class="card p-6 reveal"><strong>2.</strong> Ideia central do capítulo</div>
+        <div class="card p-6 reveal"><strong>3.</strong> Inferência lógica</div>
+        <div class="card p-6 reveal"><strong>4.</strong> Inferência semântica</div>
+        <div class="card p-6 reveal"><strong>5.</strong> Inferência pragmática</div>
+        <div class="card p-6 reveal"><strong>6.</strong> Conclusão e importância do texto</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="gradient-mesh"><div class="blob" style="width:260px;height:260px;top:10%;right:-60px;background:#65713a;opacity:.08"></div><div class="blob" style="width:220px;height:220px;bottom:-40px;left:-30px;background:#c2410c;opacity:.06"></div></div>
+    <div class="content gap-8 items-center">
+      <div>
+        <p class="smallcaps reveal mb-3">Autor</p>
+        <h2 class="font-display text-5xl mb-5 reveal">Quem é José Luiz Fiorin?</h2>
+        <ul class="space-y-4 text-xl text-text-secondary">
+          <li class="reveal">Linguista brasileiro de grande destaque nos estudos da linguagem.</li>
+          <li class="reveal">Professor da USP, com atuação em semiótica, análise do discurso e pragmática.</li>
+          <li class="reveal">Autor de obras muito usadas no ensino de linguística e língua portuguesa.</li>
+          <li class="reveal">No livro <em>Argumentação</em>, discute como os sentidos são construídos nos textos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="4">
+    <div class="gradient-mesh"><div class="blob" style="width:260px;height:260px;top:-50px;right:-40px;background:#b8860b;opacity:.08"></div><div class="blob" style="width:240px;height:240px;bottom:-60px;left:-30px;background:#65713a;opacity:.07"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Contexto histórico</p>
+      <h2 class="font-display text-5xl mb-8 reveal">De onde vem a ideia de inferência?</h2>
+      <div class="relative pl-12">
+        <div class="timeline-line"></div>
+        <div class="space-y-7">
+          <div class="flex gap-4 items-start reveal"><div class="timeline-dot mt-2"></div><div><h3 class="text-2xl font-semibold">Filosofia clássica</h3><p class="text-xl text-text-secondary">Com Aristóteles, a lógica já estudava como tirar conclusões a partir de premissas.</p></div></div>
+          <div class="flex gap-4 items-start reveal"><div class="timeline-dot mt-2"></div><div><h3 class="text-2xl font-semibold">Linguística moderna</h3><p class="text-xl text-text-secondary">No século XX, a linguagem passa a ser estudada como sistema, uso e produção de sentido.</p></div></div>
+          <div class="flex gap-4 items-start reveal"><div class="timeline-dot mt-2"></div><div><h3 class="text-2xl font-semibold">Pragmática</h3><p class="text-xl text-text-secondary">Autores como Grice mostram que compreender uma fala depende também do contexto e da cooperação entre interlocutores.</p></div></div>
+          <div class="flex gap-4 items-start reveal"><div class="timeline-dot mt-2"></div><div><h3 class="text-2xl font-semibold">Fiorin</h3><p class="text-xl text-text-secondary">Reúne lógica, semântica e pragmática para explicar como lemos, interpretamos e argumentamos.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="5">
+    <div class="gradient-mesh"><div class="blob" style="width:300px;height:300px;top:-80px;right:-60px;background:#c2410c;opacity:.08"></div><div class="blob" style="width:220px;height:220px;bottom:-40px;left:-50px;background:#b8860b;opacity:.06"></div></div>
+    <div class="content grid grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="smallcaps reveal mb-3">Ideia inicial</p>
+        <h2 class="font-display text-5xl mb-5 reveal">O exemplo do romance policial</h2>
+        <p class="text-xl text-text-secondary leading-relaxed reveal">Fiorin começa com <em>Assassinato no Expresso Oriente</em>, de Agatha Christie. O detetive Poirot resolve o crime observando pistas, eliminando hipóteses impossíveis e ligando indícios até chegar à solução.</p>
+        <p class="text-xl text-text-secondary leading-relaxed mt-4 reveal">Esse início é importante porque mostra que inferir é exatamente isso: ir além do que está dado de forma explícita.</p>
+      </div>
+      <div class="card p-8 reveal">
+        <p class="smallcaps mb-3">Definição central</p>
+        <p class="text-3xl leading-relaxed">Inferência é a operação pela qual aceitamos uma proposição como correta em razão de sua relação com outras proposições.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="6">
+    <div class="gradient-mesh"><div class="blob" style="width:280px;height:280px;top:-60px;right:-40px;background:#65713a;opacity:.08"></div><div class="blob" style="width:240px;height:240px;bottom:-60px;left:-40px;background:#c2410c;opacity:.06"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Tese do capítulo</p>
+      <h2 class="font-display text-5xl mb-8 reveal">O texto diz mais do que parece</h2>
+      <div class="grid grid-cols-3 gap-6">
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Explícito</h3><p class="text-lg text-text-secondary">É aquilo que está diretamente enunciado.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Implícito</h3><p class="text-lg text-text-secondary">Inclui pressupostos, subentendidos e consequências não ditas.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Argumentação</h3><p class="text-lg text-text-secondary">Avança justamente porque o leitor faz inferências ao interpretar o discurso.</p></div>
+      </div>
+      <div class="card p-7 mt-7 reveal quote">
+        <p class="text-2xl text-text-secondary">Para Fiorin, ler não é apenas decodificar frases; é reconstruir sentidos que o texto sugere, pressupõe ou implica.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="7">
+    <div class="gradient-mesh"><div class="blob" style="width:260px;height:260px;top:-40px;right:-50px;background:#c2410c;opacity:.08"></div><div class="blob" style="width:230px;height:230px;bottom:-50px;left:-40px;background:#b8860b;opacity:.06"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Classificação</p>
+      <h2 class="font-display text-5xl mb-8 reveal">Os três tipos de inferência</h2>
+      <div class="grid grid-cols-3 gap-6">
+        <div class="card p-8 reveal"><div class="text-5xl mb-4">🧠</div><h3 class="text-2xl font-semibold mb-2">Lógica</h3><p class="text-lg text-text-secondary">Baseada em relações formais entre proposições.</p></div>
+        <div class="card p-8 reveal"><div class="text-5xl mb-4">💬</div><h3 class="text-2xl font-semibold mb-2">Semântica</h3><p class="text-lg text-text-secondary">Deriva do significado das palavras e expressões.</p></div>
+        <div class="card p-8 reveal"><div class="text-5xl mb-4">🤝</div><h3 class="text-2xl font-semibold mb-2">Pragmática</h3><p class="text-lg text-text-secondary">Depende do contexto e das regras de uso da linguagem.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="8">
+    <div class="gradient-mesh"><div class="blob" style="width:280px;height:280px;top:-70px;right:-60px;background:#c2410c;opacity:.08"></div><div class="blob" style="width:210px;height:210px;bottom:-40px;left:-30px;background:#65713a;opacity:.06"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Inferência lógica</p>
+      <h2 class="font-display text-5xl mb-6 reveal">Como funciona?</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Silogismo</h3><p class="text-xl text-text-secondary">“Todas as cidades grandes são perigosas. São Paulo é uma cidade grande. Logo, São Paulo é perigosa.”</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Eliminação</h3><p class="text-xl text-text-secondary">Se várias hipóteses são descartadas e só uma resta, ela passa a ser a explicação aceita.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Modus ponens</h3><p class="text-xl text-text-secondary">Se A implica B e A é verdadeiro, então B também é verdadeiro.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Modus tollens</h3><p class="text-xl text-text-secondary">Se A implica B e B não acontece, conclui-se que A também não ocorreu.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="9">
+    <div class="gradient-mesh"><div class="blob" style="width:280px;height:280px;top:-60px;right:-60px;background:#b8860b;opacity:.08"></div><div class="blob" style="width:240px;height:240px;bottom:-40px;left:-40px;background:#c2410c;opacity:.06"></div></div>
+    <div class="content grid grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="smallcaps reveal mb-3">Exemplo importante</p>
+        <h2 class="font-display text-5xl mb-5 reveal">O enigma das cinco casas</h2>
+        <p class="text-xl text-text-secondary leading-relaxed reveal">Fiorin também usa o famoso problema das cinco casas, em que o leitor cruza nacionalidades, cores, bebidas, animais e áreas de estudo para descobrir quem bebe água e quem é dono da zebra.</p>
+        <p class="text-xl text-text-secondary leading-relaxed mt-4 reveal">Esse exemplo mostra que inferir é organizar pistas e não apenas “adivinhar”.</p>
+      </div>
+      <div class="card p-8 reveal">
+        <p class="smallcaps mb-4">Função didática</p>
+        <div class="space-y-4">
+          <div><div class="flex justify-between mb-1 text-sm"><span>Observação de pistas</span><span>100%</span></div><div class="mini-bar" style="width:100%"></div></div>
+          <div><div class="flex justify-between mb-1 text-sm"><span>Relação entre dados</span><span>85%</span></div><div class="mini-bar" style="width:85%"></div></div>
+          <div><div class="flex justify-between mb-1 text-sm"><span>Conclusão lógica</span><span>70%</span></div><div class="mini-bar" style="width:70%"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="10">
+    <div class="gradient-mesh"><div class="blob" style="width:270px;height:270px;top:-55px;right:-40px;background:#65713a;opacity:.08"></div><div class="blob" style="width:220px;height:220px;bottom:-45px;left:-35px;background:#b8860b;opacity:.07"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Inferência semântica</p>
+      <h2 class="font-display text-5xl mb-8 reveal">Pressuposto e subentendido</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="card p-8 reveal">
+          <h3 class="text-2xl font-semibold mb-3">Pressuposto</h3>
+          <p class="text-xl text-text-secondary">É um conteúdo implícito que já vem acionado pela própria forma linguística.</p>
+          <p class="text-lg mt-4"><strong>Exemplo:</strong> “Antônio parou de usar drogas.”</p>
+          <p class="text-lg text-text-secondary">Pressuposto: Antônio usava drogas antes.</p>
+        </div>
+        <div class="card p-8 reveal">
+          <h3 class="text-2xl font-semibold mb-3">Subentendido</h3>
+          <p class="text-xl text-text-secondary">Depende do contexto, da situação e do conhecimento compartilhado.</p>
+          <p class="text-lg mt-4"><strong>Exemplo:</strong> uma reportagem pode sugerir corrupção sem afirmar isso diretamente.</p>
+          <p class="text-lg text-text-secondary">Aqui, o sentido precisa ser reconstruído pelo leitor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="11">
+    <div class="gradient-mesh"><div class="blob" style="width:260px;height:260px;top:-50px;right:-50px;background:#c2410c;opacity:.08"></div><div class="blob" style="width:220px;height:220px;bottom:-50px;left:-40px;background:#65713a;opacity:.06"></div></div>
+    <div class="content grid grid-cols-2 gap-8 items-center">
+      <div class="card p-8 reveal">
+        <p class="smallcaps mb-3">Ponto essencial</p>
+        <h3 class="text-3xl font-semibold mb-4">Por que o pressuposto é tão forte?</h3>
+        <p class="text-xl text-text-secondary leading-relaxed">Porque ele entra no discurso como algo já aceito. Em vez de discutir se a informação é verdadeira, o leitor tende a partir dela como base.</p>
+      </div>
+      <div>
+        <h2 class="font-display text-5xl mb-5 reveal">Estratégia argumentativa</h2>
+        <ul class="space-y-4 text-xl text-text-secondary">
+          <li class="reveal">O pressuposto orienta a interpretação.</li>
+          <li class="reveal">Ele pode carregar preconceitos e generalizações.</li>
+          <li class="reveal">Mesmo na negação, muitas vezes o conteúdo pressuposto continua ativo.</li>
+          <li class="reveal">Por isso, é um recurso poderoso de persuasão.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="12">
+    <div class="gradient-mesh"><div class="blob" style="width:290px;height:290px;top:-70px;right:-40px;background:#b8860b;opacity:.08"></div><div class="blob" style="width:230px;height:230px;bottom:-50px;left:-40px;background:#c2410c;opacity:.06"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Inferência pragmática</p>
+      <h2 class="font-display text-5xl mb-8 reveal">O papel do contexto</h2>
+      <div class="grid grid-cols-2 gap-8">
+        <div>
+          <p class="text-xl text-text-secondary leading-relaxed reveal">A inferência pragmática nasce das regras de uso da linguagem em interação. Fiorin usa Grice para explicar que entendemos o que o outro diz porque presumimos cooperação na conversa.</p>
+          <div class="card p-6 mt-6 reveal quote"><p class="text-xl text-text-secondary">Não basta olhar para as palavras; é preciso observar a situação comunicativa.</p></div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="card p-5 reveal"><h3 class="font-semibold text-xl mb-2">Quantidade</h3><p class="text-text-secondary">Dizer o necessário.</p></div>
+          <div class="card p-5 reveal"><h3 class="font-semibold text-xl mb-2">Qualidade</h3><p class="text-text-secondary">Dizer o que parece verdadeiro.</p></div>
+          <div class="card p-5 reveal"><h3 class="font-semibold text-xl mb-2">Relação</h3><p class="text-text-secondary">Ser pertinente ao assunto.</p></div>
+          <div class="card p-5 reveal"><h3 class="font-semibold text-xl mb-2">Maneira</h3><p class="text-text-secondary">Ser claro, breve e ordenado.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="13">
+    <div class="gradient-mesh"><div class="blob" style="width:280px;height:280px;top:-60px;right:-50px;background:#65713a;opacity:.08"></div><div class="blob" style="width:240px;height:240px;bottom:-50px;left:-30px;background:#b8860b;opacity:.06"></div></div>
+    <div class="content grid grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="smallcaps reveal mb-3">Exemplo de pragmática</p>
+        <h2 class="font-display text-5xl mb-5 reveal">A piada da alfândega</h2>
+        <p class="text-xl text-text-secondary leading-relaxed reveal">Na anedota apresentada por Fiorin, o fiscal pergunta “Licor, conhaque, grapa...?” e o passageiro responde “Só um cafezinho”. O humor surge porque ele interpretou a situação de forma errada.</p>
+      </div>
+      <div class="card p-8 reveal">
+        <h3 class="text-2xl font-semibold mb-4">O que isso prova?</h3>
+        <ul class="space-y-3 text-xl text-text-secondary">
+          <li>A interpretação depende do contexto.</li>
+          <li>Uma inferência pragmática pode estar certa ou errada.</li>
+          <li>Conversar é interpretar intenções, e não apenas palavras.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="14">
+    <div class="gradient-mesh"><div class="blob" style="width:260px;height:260px;top:-50px;right:-40px;background:#c2410c;opacity:.08"></div><div class="blob" style="width:220px;height:220px;bottom:-40px;left:-35px;background:#b8860b;opacity:.06"></div></div>
+    <div class="content">
+      <p class="smallcaps reveal mb-3">Síntese</p>
+      <h2 class="font-display text-5xl mb-8 reveal">Por que esse texto é importante?</h2>
+      <div class="grid grid-cols-3 gap-6">
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Leitura crítica</h3><p class="text-lg text-text-secondary">Ajuda a perceber sentidos implícitos, manipulações e preconceitos nos discursos.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Argumentação</h3><p class="text-lg text-text-secondary">Mostra que convencer alguém depende de raciocínios nem sempre explicitados.</p></div>
+        <div class="card p-7 reveal"><h3 class="text-2xl font-semibold mb-3">Vida cotidiana</h3><p class="text-lg text-text-secondary">As inferências aparecem em notícias, conversas, propaganda, política e textos acadêmicos.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="15">
+    <div class="gradient-mesh">
+      <div class="blob" style="width:320px;height:320px;top:-70px;right:-60px;background:#c2410c;opacity:.14"></div>
+      <div class="blob" style="width:260px;height:260px;bottom:-50px;left:-40px;background:#b8860b;opacity:.12"></div>
+      <div class="blob" style="width:220px;height:220px;top:45%;left:18%;background:#65713a;opacity:.1"></div>
+    </div>
+    <div class="content text-center">
+      <div class="hero-emoji reveal">🗣️</div>
+      <p class="smallcaps reveal mb-4">Encerramento</p>
+      <h2 class="font-display text-[clamp(2.6rem,5vw,4.8rem)] text-accent-1 reveal">Concluir é perceber o implícito</h2>
+      <p class="text-[clamp(1rem,2vw,1.4rem)] text-text-secondary mt-5 max-w-4xl mx-auto reveal">Fiorin nos mostra que argumentar e interpretar dependem da capacidade de inferir. Em outras palavras, compreender um texto é sempre ir além do que está escrito.</p>
+      <p class="mt-10 text-text-muted reveal">Obrigado!</p>
+    </div>
+  </section>
+</div>
+
+<div class="nav-controls">
+  <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
+  <div class="slide-dots" id="dots"></div>
+  <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
+  <span class="slide-counter" id="counter">1 / 15</span>
+</div>
+
+<script>
+let current = 1;
+const total = document.querySelectorAll('.slide').length;
+const dotsContainer = document.getElementById('dots');
+const counter = document.getElementById('counter');
+for (let i = 1; i <= total; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 1 ? ' active' : '');
+  dot.onclick = () => goToSlide(i);
+  dotsContainer.appendChild(dot);
+}
+function updateNav(){
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active', i+1===current));
+  counter.textContent = current + ' / ' + total;
+}
+function goToSlide(n){
+  const prev = document.querySelector('.slide.active');
+  const next = document.querySelector(`.slide[data-slide="${n}"]`);
+  if(prev) prev.classList.remove('active');
+  if(next){ next.classList.add('active'); animateSlide(next); }
+  current = n; updateNav();
+}
+function changeSlide(dir){
+  let next = current + dir;
+  if(next < 1) next = total;
+  if(next > total) next = 1;
+  goToSlide(next);
+}
+document.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowRight' || e.key===' ') { e.preventDefault(); changeSlide(1); }
+  if(e.key==='ArrowLeft') { e.preventDefault(); changeSlide(-1); }
+});
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if(Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+});
+function animateSlide(slide){
+  slide.querySelectorAll('.reveal').forEach((el,i)=>{
+    el.style.transition='none';
+    el.style.opacity='0';
+    el.style.transform='translateY(16px)';
+    el.offsetHeight;
+    const delay=i*0.07;
+    el.style.transition=`opacity .35s ease ${delay}s, transform .35s ease ${delay}s`;
+    el.style.opacity='1';
+    el.style.transform='translateY(0)';
+  });
+}
+animateSlide(document.querySelector('.slide.active'));
+</script>
+</body>
+</html>
